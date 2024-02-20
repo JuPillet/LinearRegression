@@ -33,6 +33,11 @@ def standardizer(kms, pcs):
 #	nrmDatas = [((i - average) / stdDev) for i in datas]
 #	return average, stdDev, nrmDatas
 
+def destandardizer(theta0, theta1, minKm, maxKm, minPc, maxPc):
+	tmpTheta1 = theta1 * (maxPc - minPc) / (maxKm - minKm)
+	tmpTheta0 = theta0 * (maxPc - minPc) + minPc - tmpTheta1 * minKm
+	return tmpTheta0, tmpTheta1
+
 def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
 	learningRate = 0.05
 	iterrations = 1000
@@ -61,11 +66,6 @@ def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
 		deTheta0, deTheta1 = destandardizer(theta0, theta1, minKm, maxKm, minPc, maxPc)
 		printRegressionLine(ax, kms, pcs, deTheta0, deTheta1)
 	return deTheta0, deTheta1
-
-def destandardizer(theta0, theta1, minKm, maxKm, minPc, maxPc):
-	tmpTheta1 = theta1 * (maxPc - minPc) / (maxKm - minKm)
-	tmpTheta0 = theta0 * (maxPc - minPc) + minPc - tmpTheta1 * minKm
-	return tmpTheta0, tmpTheta1
 
 def	main():
 	csv = pd.read_csv("./Subject/data.csv")
