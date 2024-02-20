@@ -32,53 +32,42 @@ def loadModelLR(init, oldTheta0, oldTheta1):
 				raise Exception(" 1 : le model est innexistant ou vous ne possedez pas les droits d'accès.")
 			with open(path, 'r') as ModelLR:
 				lines = ModelLR.readlines()
-			if (lines.__len__() != 4):
+			if (lines.__len__() != 2):
 				raise Exception(
 					"2 : format du modelLR invalide\n" +
 					"-nombre d'entrée invalid, le format doit etre le suivant:\n\n" +
-					"average:valeur\n" +
-					"stdDev:valeur\n" +
 					"theta0:valeur\n" +
 					"theta1:valeur"
 				)
-			average = lines[0].split(":")
-			stdDev = lines[1].split(":")
-			theta0 = lines[2].split(":")
-			theta1 = lines[3].split(":")
-			if (average[0] != "average" or stdDev[0] != "stdDev" or
-			theta0[0] != "theta0" or theta1[0] != "theta1" or
-			average.__len__() != 2 or stdDev.__len__() != 2 or
+			theta0 = lines[0].split(":")
+			theta1 = lines[1].split(":")
+			if (theta0[0] != "theta0" or theta1[0] != "theta1" or
 			theta0.__len__() != 2 or theta1.__len__() != 2):
 				raise Exception(
 					"3 : format du modelLR invalide\n" +
 					"-les 4 entrées doive etre un ensemble 'clef:valeur' comme l'exemple suivant:\n" +
-					"average:valeur\n" +
-					"stdDev:valeur\n" +
 					"theta0:valeur\n" +
 					"theta1:valeur"
 				)
 			try:
-				average = float(average[1])
-				stdDev = float(stdDev[1])
 				theta0 = float(theta0[1])
 				theta1 = float(theta1[1])
-				return average, stdDev, theta0, theta1
+				return theta0, theta1
 			except Exception as error:
 				raise Exception(f"4 : {error}")
 		except Exception as error:
 			print(f"Error {error}")
 			print("\n----------------------------------------------------------\n")
 
-def estimation(average, stdDev, theta0, theta1, km):
-		nrmKM = (km - average) / stdDev
-		estimatedPrice = estimatePrice(theta0, theta1, nrmKM)
+def estimation(km, theta0, theta1):
+		estimatedPrice = estimatePrice(km, theta0, theta1)
 		if (estimatedPrice < 0):
 			estimatedPrice = 0
-		print(f"Pour {km}, le prix est estimé à {estimatedPrice:.2f}")
+		print(f"Pour {km:.0f}, le prix est estimé à {estimatedPrice:.2f}")
 		print("\n----------------------------------------------------------\n")
 
 if __name__ == "__main__":
-	average, stdDev, theta0, theta1 = loadModelLR(False, None, None)
+	theta0, theta1 = loadModelLR(False, None, None)
 	while (True):
 		try:
 			print("Veuillez entrez une saisie :")
@@ -89,7 +78,7 @@ if __name__ == "__main__":
 			entry = input()
 			print("\n----------------------------------------------------------\n")
 			if (entry == "model"):
-				average, stdDev, theta0, theta1 = loadModelLR(True, theta0, theta1)
+				theta0, theta1 = loadModelLR(True, theta0, theta1)
 			elif (entry == "exit"):
 				print("predicator va quitter\n")
 				exit(0)
@@ -97,7 +86,7 @@ if __name__ == "__main__":
 				km = float(entry)
 				if (km < 0):
 					raise Exception("5 : le kilometrage ne peut etre négatif")
-				estimation(average, stdDev, theta0, theta1, km)
+				estimation(km, theta0, theta1)
 			else:
 				raise Exception("6 : saissie incorrect")
 		except Exception as error:
