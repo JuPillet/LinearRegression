@@ -9,7 +9,7 @@ def printRegressionLine(ax, kms, pcs, theta0, theta1):
 	ax.set_xlabel('Kilométrage')
 	ax.set_ylabel('Prix')
 	ax.legend()
-	plt.pause(0.01)
+	plt.pause(0.00001)
 
 def printModelLR(theta0, theta1):
 	print(f"theta0: {theta0}\ntheta1: {theta1}")
@@ -20,9 +20,9 @@ def printModelLR(theta0, theta1):
 def estimatePrice(km, theta0, theta1):
 	return theta0 + theta1 * km
 
-def diverter(m, datas, average):
-	nrmDatas = sum((i - average) ** 2 for i in datas)
-	return (nrmDatas / m) ** 0.5
+#def diverter(m, datas, average):
+#	nrmDatas = sum((i - average) ** 2 for i in datas)
+#	return (nrmDatas / m) ** 0.5
 
 def standardizer(kms, pcs):
 	meanKms, meanPcs = np.mean(kms), np.mean(pcs)
@@ -54,15 +54,15 @@ def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
 #boucle sur chaque valeur de donnée
 		for i in range(m):
 			km = stdKms[i]
-			price = stdPcs[i]
+			pc = stdPcs[i]
 #calcul d'erreur
-			error = estimatePrice(km, theta0, theta1) - price
+			error = estimatePrice(km, theta0, theta1) - pc
 #calcule temportaire de Theta0 et Theta1
 			tmp0 += error
 			tmp1 += (error * km)
 #ajustement Theta0 et Theta1
-		theta0 -= midRate * tmp0
-		theta1 -= midRate * tmp1
+		theta0 -= tmp0 * midRate
+		theta1 -= tmp1 * midRate
 		deTheta0, deTheta1 = destandardizer(theta0, theta1, minKm, maxKm, minPc, maxPc)
 		printRegressionLine(ax, kms, pcs, deTheta0, deTheta1)
 	return deTheta0, deTheta1
