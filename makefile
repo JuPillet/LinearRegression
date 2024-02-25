@@ -3,10 +3,10 @@ all:
 	@echo "L'environnement virtuelle a bien été initialiser, lancez le depuis la racine du projet avec la commande:\\nsource ./pythenv3.sh"
 
 trainer:
-	python3 trainer.sh
+	python3 trainer.py
 
 predicator:
-	python3 predicator.sh
+	python3 predicator.py
 
 delete:
 	rm -rf pythenv3 modelLR

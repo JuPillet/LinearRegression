@@ -2,7 +2,6 @@ import os
 import re
 from trainer import estimatePrice
 
-
 def isKm(entry):
 	pattern = r'^[-+]?[0-9]+[.,]?[0-9]?$'
 	return bool(re.match(pattern, entry))
@@ -92,7 +91,3 @@ if __name__ == "__main__":
 		except Exception as error:
 			print(f"Error {error}")
 			print("\n----------------------------------------------------------\n")
-
-
-	
-		

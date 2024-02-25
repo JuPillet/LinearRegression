@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-import matplotlib
-matplotlib.use('TkAgg')
+import sys
+#import matplotlib
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 def printRegressionLine(ax, kms, pcs, theta0, theta1):
@@ -22,6 +23,14 @@ def printModelLR(theta0, theta1):
 def estimatePrice(km, theta0, theta1):
 	return theta0 + theta1 * km
 
+def calculatePrecision(kms, m, meanPc, theta0, theta1):
+	meanEstimatedPcs = None
+	for km in kms:
+		meanEstimatedPcs += estimatePrice(km, theta0, theta1)
+	meanEstimatedPcs /= m
+	precision = (meanEstimatedPcs / meanPc if meanEstimatedPcs < meanPc else meanPc / meanEstimatedPcs) * 100
+	return precision
+	
 #def diverter(m, datas, average):
 #	nrmDatas = sum((i - average) ** 2 for i in datas)
 #	return (nrmDatas / m) ** 0.5
@@ -41,8 +50,8 @@ def destandardizer(theta0, theta1, minKm, maxKm, minPc, maxPc):
 	return tmpTheta0, tmpTheta1
 
 def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
-	learningRate = 0.05
-	iterrations = 1000
+	learningRate = 0.001
+	iterrations = 100000
 	midRate = learningRate / m
 
 	theta0 = 0
@@ -70,6 +79,10 @@ def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
 	return deTheta0, deTheta1
 
 def	main():
+	argc : int | str = len(sys.argv)
+	bonus = False if argc == 2 else sys.argv[1]
+	if bonus != False and bonus != "bonus":
+		raise Exception(f"option '{bonus}' invalide et non reconnu")
 	csv = pd.read_csv("./Subject/data.csv")
 	kms = csv['km']
 	pcs = csv['price']
@@ -77,6 +90,7 @@ def	main():
 	meanKms, meanPcs, minKm, maxKm, minPc, maxPc, stdKms, stdPcs = standardizer(kms, pcs)
 	fig, ax = plt.subplots()
 	theta0, theta1 = training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs)
+	precision = calculatePrecision(kms, m, meanKms, meanPcs, theta0, theta1)
 	printModelLR(theta0, theta1)
 	printRegressionLine(ax, kms, pcs, theta0, theta1)
 	plt.show()
