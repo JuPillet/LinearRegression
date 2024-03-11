@@ -2,6 +2,12 @@ all:
 	@bash pythenv3.sh
 	@echo "L'environnement virtuelle a bien été initialiser, lancez le depuis la racine du projet avec la commande:\\nsource ./pythenv3.sh"
 
+inspy:
+	@sudo apt update && apt install python3 python3-pip python3-tk -y
+
+purpy:
+	@sudo apt purge python3-pip python3-tk -y
+
 trainer:
 	python3 trainer.py
 

@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import sys
-import tkinter
+#import tkinter
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 def printRegressionLine(ax, kms, pcs, theta0, theta1):
 	ax.clear()
@@ -15,10 +16,9 @@ def printRegressionLine(ax, kms, pcs, theta0, theta1):
 	ax.legend()
 	plt.pause(0.00001)
 
-def printModelLR(theta0, theta1, COD):
+def printModelLR(theta0, theta1):
 	print(f"theta0: {theta0}")
 	print(f"theta1: {theta1}")
-	print(f"COD (Precision): {COD}")
 	with open('modelLR', 'w') as ModelLR:
 		ModelLR.write(f"theta0:{theta0}\n")
 		ModelLR.write(f"theta1:{theta1}")
@@ -26,15 +26,27 @@ def printModelLR(theta0, theta1, COD):
 def estimatePrice(km, theta0, theta1):
 	return theta0 + theta1 * km
 
-def calculatePrecision(stdKms, stdPcs, m, stdTheta0, stdTheta1):
-	meanStdPcs = sum(stdPcs) / m
-#	Sum of Square's Residuals
-	SSR = sum([(estimatePrice(stdKm, stdTheta0, stdTheta0) - meanStdPcs) ** 2] for stdKm in stdKms)
-#	Sum of Square's total
-	SST = sum([(stdPc - meanStdPcs) ** 2] for stdPc in stdPcs)
+def calculatePrecision(kms, pcs, m, theta0, theta1):
+	meanStdPcs = sum(pcs) / m
+	estmPcs = estimatePrice(kms, theta0, theta1)
+	diffPcs = estmPcs - pcs
+#	R²:
+##	Sum of Square's Residuals
+	ssr = sum((estmPcs - meanStdPcs) ** 2)
+##	Sum of Square's total
+	sst = sum((pcs - meanStdPcs) ** 2)
+##	coefficient of determination
+	cod = 1 - ssr/sst
+	print(f"coefficient of determination (Precision): {cod}")
+#	Root Mean Squared Error
+	rmse = np.sqrt(sum(diffPcs ** 2) / m)
+	print(f'RMSE : {rmse}')
+#	median absolute error
+	mae = sum(abs(diffPcs)) / m
+	print(f'MAE : {mae}')
+
+
 #	coefficient of determination
-	COD = 1 - (SSR/SST)
-	return COD
 
 def standardizer(kms, pcs):
 	meanKms, meanPcs = np.mean(kms), np.mean(pcs)
@@ -77,7 +89,32 @@ def training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs):
 		stdTheta1 -= tmp1 * midRate
 		theta0, theta1 = destandardizer(stdTheta0, stdTheta1, minKm, maxKm, minPc, maxPc)
 		printRegressionLine(ax, kms, pcs, theta0, theta1)
-	return stdTheta0, stdTheta1, theta0, theta1
+	return theta0, theta1
+
+def test(kms, pcs):
+# Données
+	km = np.array(kms).reshape(-1, 1)
+	price = np.array(pcs).reshape(-1, 1)
+
+# Ajustement du modèle de régression linéaire
+	model = LinearRegression()
+	model.fit(km, price)
+
+# Prédictions du modèle
+	predicted_price = model.predict(km)
+
+# Calcul de SSR
+	mean_price = np.mean(price)
+	SSR = np.sum((predicted_price - mean_price) ** 2)
+
+# Calcul de SST
+	SST = np.sum((price - mean_price) ** 2)
+
+# Calcul de R²
+	R_squared = 1 - (SSR / SST)
+
+	print("Coefficient de détermination (R²) :", R_squared)
+
 
 def	main():
 	argc : int | str = len(sys.argv)
@@ -87,14 +124,15 @@ def	main():
 	csv = pd.read_csv("./Subject/data.csv")
 	kms = csv['km']
 	pcs = csv['price']
+#	test(kms, pcs)
 	m = len(kms)
 	meanKms, meanPcs, minKm, maxKm, minPc, maxPc, stdKms, stdPcs = standardizer(kms, pcs)
 	fig, ax = plt.subplots()
-	stdTheta0, stdTheta1, theta0, theta1 = training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs)
-	COD = calculatePrecision(stdKms, stdPcs, m, stdTheta0, stdTheta1)
-	printModelLR(theta0, theta1, COD)
+	theta0, theta1 = training(m, stdKms, stdPcs, minKm, maxKm, minPc, maxPc, ax, kms, pcs)
+	cod = calculatePrecision(kms, pcs, m, theta0, theta1)
+	printModelLR(theta0, theta1)
 	printRegressionLine(ax, kms, pcs, theta0, theta1)
-	plt.show()
+	plt.show()	
 
 if __name__ == "__main__":
 	try:
