@@ -8,6 +8,9 @@ inspy:
 purpy:
 	@sudo apt purge python3-pip python3-tk -y
 
+exitenv:
+	@deactivate
+
 trainer:
 	python3 trainer.py
 
