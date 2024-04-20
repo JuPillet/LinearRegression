@@ -62,7 +62,8 @@ def estimation(km, theta0, theta1):
 		print("\n----------------------------------------------------------\n")
 
 if __name__ == "__main__":
-	theta0, theta1 = 0, 0
+	theta0 = 0
+	theta1 = 0
 	while (True):
 		try:
 			print("Veuillez entrez une saisie :")
