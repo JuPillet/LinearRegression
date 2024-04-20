@@ -6,16 +6,15 @@ def isKm(entry):
 	pattern = r'^[-+]?[0-9]+[.,]?[0-9]?$'
 	return bool(re.match(pattern, entry))
 
-def loadModelLR(init, oldTheta0, oldTheta1):
+def loadModelLR(oldTheta0, oldTheta1):
 	path = None
-	theta0 = None
-	theta1 = None
+	theta0 = 0
+	theta1 = 0
 	while (True):
 		try:
 			print("Veuiller entrer:")
 			print("'un/chemin/vers/model/de/donné' pour selectionner celui ci")
-			if (init == True):
-				print("'retour' pour concerver le model déjà utilisé")
+			print("'retour' pour concerver le model déjà utilisé")
 			print("'exit' pour quitter le programme:")
 			print(">>>", end="")
 			path = input()
@@ -23,10 +22,7 @@ def loadModelLR(init, oldTheta0, oldTheta1):
 			if (path == "exit"):
 				exit(0)
 			elif (path == "retour"):
-				if (init == False):
-					raise Exception(" 0 : Auccun model selectionné")
-				else:
-					return oldTheta0, oldTheta1
+				return oldTheta0, oldTheta1
 			elif (os.path.isfile(path) == False and os.access(path, os.R_OK) == False):
 				raise Exception(" 1 : le model est innexistant ou vous ne possedez pas les droits d'accès.")
 			with open(path, 'r') as ModelLR:
@@ -66,7 +62,7 @@ def estimation(km, theta0, theta1):
 		print("\n----------------------------------------------------------\n")
 
 if __name__ == "__main__":
-	theta0, theta1 = loadModelLR(False, None, None)
+	theta0, theta1 = 0, 0
 	while (True):
 		try:
 			print("Veuillez entrez une saisie :")
@@ -77,7 +73,7 @@ if __name__ == "__main__":
 			entry = input()
 			print("\n----------------------------------------------------------\n")
 			if (entry == "model"):
-				theta0, theta1 = loadModelLR(True, theta0, theta1)
+				theta0, theta1 = loadModelLR(theta0, theta1)
 			elif (entry == "exit"):
 				print("predicator va quitter\n")
 				exit(0)
