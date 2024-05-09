@@ -8,8 +8,8 @@ def isKm(entry):
 
 def loadModelLR(oldTheta0, oldTheta1):
 	path = None
-	theta0 = 0
-	theta1 = 0
+	theta0 = None
+	theta1 = None
 	while (True):
 		try:
 			print("Veuiller entrer:")
@@ -22,7 +22,7 @@ def loadModelLR(oldTheta0, oldTheta1):
 			if (path == "exit"):
 				exit(0)
 			elif (path == "retour"):
-				return oldTheta0, oldTheta1
+					return oldTheta0, oldTheta1
 			elif (os.path.isfile(path) == False and os.access(path, os.R_OK) == False):
 				raise Exception(" 1 : le model est innexistant ou vous ne possedez pas les droits d'accès.")
 			with open(path, 'r') as ModelLR:
